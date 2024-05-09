@@ -65,6 +65,22 @@ class ResponseFormat(OpenAIBaseModel):
     # type must be "json_object" or "text"
     type: Literal["text", "json_object"]
 
+class ToolFunction(BaseModel):
+    name: str
+    description: str
+    parameters: Optional[Dict[str, object]] = None
+
+class ChatCompletionNamedFunction(BaseModel):
+    name: str
+
+class ChatCompletionNamedToolChoice(BaseModel):
+    function: ChatCompletionNamedFunction
+    type: Optional[Literal["function"]] = None
+
+class ChatCompletionTool(BaseModel):
+    type: str = "function"
+    function: ToolFunction = None
+
 
 class ChatCompletionRequest(OpenAIBaseModel):
     # Ordered by official OpenAI API documentation
@@ -86,6 +102,8 @@ class ChatCompletionRequest(OpenAIBaseModel):
     stream: Optional[bool] = False
     temperature: Optional[float] = 0.7
     top_p: Optional[float] = 1.0
+    tools: Optional[List[ChatCompletionTool]] = None
+    tool_choice: Optional[Union[Literal["auto", "none"],ChatCompletionNamedToolChoice]] = "auto"
     user: Optional[str] = None
 
     # doc: begin-chat-completion-sampling-params

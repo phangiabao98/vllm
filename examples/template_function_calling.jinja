@@ -1,0 +1,45 @@
+{% for message in messages %}
+    <|im_start|>{{ message.role }}
+    {% if message.role == 'system' %}
+        {{ message.content }}
+    <|im_end|>
+    {% endif %}
+    {% if message.role == 'user' %}
+        {{ message.content }}
+    <|im_end|>
+    {% endif %}
+    {% if message.role == 'assistant' %}
+        {% if message.content and message.content | length > 0 %}
+            {% if tool_calls %}
+                message:
+            {% endif %}
+            {{ message.content }}
+            <|im_end|>
+        {% endif %}
+        {% if 'tool_calls' in message %}
+            {% for tool_call in message.tool_calls %}
+                functions.{{ tool_call.function.name }}:
+                {{ tool_call.function.arguments }}
+            {% endfor %}
+            <|im_end|>
+        {% endif %}
+    {% endif %}
+    {% if tools %}
+        You have access to the following functions:
+        {% for tool in tools %}
+            functions.{{ tool.function.name }}:
+            {{ tool.function.parameters | tojson }}
+        {% endfor %}
+        You can respond to users messages with either a single message or one or more function calls.
+        To respond with a message begin the message with 'message:', use the following format:
+        message:
+        <message>
+        To respond with one or more function calls begin the message with 'functions.<function_name>:', use the following format:
+        functions.<function_name>:
+        { "arg1": "value1", "arg2": "value2" }'
+        functions.<function_name>:
+        { "arg1": "value1", "arg2": "value2" }
+    {% endif %}
+{% endfor %}
+{% if add_generation_prompt %}<|im_start|>assistant\n{% endif %}
+

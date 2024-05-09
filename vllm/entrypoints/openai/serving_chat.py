@@ -99,9 +99,10 @@ class OpenAIServingChat(OpenAIServing):
                 conversation=conversation,
                 tokenize=False,
                 add_generation_prompt=request.add_generation_prompt,
+                tools=request.tools
             )
         except Exception as e:
-            logger.error("Error in applying chat template from request: %s", e)
+            logger.error("Error in applying chat template from request: %s", e, exc_info=True)
             return self.create_error_response(str(e))
 
         request_id = f"cmpl-{random_uuid()}"
