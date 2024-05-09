@@ -433,10 +433,20 @@ class CompletionStreamResponse(OpenAIBaseModel):
     choices: List[CompletionResponseStreamChoice]
     usage: Optional[UsageInfo] = Field(default=None)
 
+class Function(BaseModel):
+    name: str
+    arguments: str
+
+class ChatCompletionMessageToolCall(BaseModel):
+    index: int
+    id: str
+    type: str
+    function: Function
 
 class ChatMessage(OpenAIBaseModel):
     role: str
-    content: str
+    content: Optional[str] = None
+    tool_calls: Optional[List[ChatCompletionMessageToolCall]] = None
 
 
 class ChatCompletionResponseChoice(OpenAIBaseModel):
